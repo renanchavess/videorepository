@@ -30,6 +30,6 @@ class VideosTags extends Migration
 
     public function down()
     {
-        //
+        
     }
 }

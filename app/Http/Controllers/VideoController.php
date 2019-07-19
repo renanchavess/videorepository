@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Video;
+use App\Tag;
 use Illuminate\Http\Request;
 
 class VideoController extends Controller
@@ -14,7 +15,8 @@ class VideoController extends Controller
      */
     public function index()
     {
-        return view('video.index');
+        $videos = Video::all();
+        return view('video.index', compact('videos'));
     }
 
     /**
@@ -24,7 +26,8 @@ class VideoController extends Controller
      */
     public function create()
     {
-        return view('video.create');
+        $tags = Tag::all();
+        return view('video.create', compact('tags'));
     }
 
     /**
@@ -41,32 +44,35 @@ class VideoController extends Controller
         ];
         $request->validate($rules);
 
-        $path_low       = NULL;
-        $path_medium    = NULL;
-        $path_high      = NULL;
+        $pathLow       = NULL;
+        $pathMedium    = NULL;
+        $pathHigh      = NULL;
 
         if(!empty($request->file('low')))
-            $path_low       =  $request->file('low')->store('videos/low', 'public');//360px
+            $pathLow       =  $request->file('low')->store('videos/low', 'public');//360px
         
         if(!empty($request->file('medium')))
-            $path_medium    =  $request->file('medium')->store('videos/medium', 'public');//480px
+            $pathMedium    =  $request->file('medium')->store('videos/medium', 'public');//480px
         
         if(!empty($request->file('high')))
-            $path_high      =  $request->file('high')->store('videos/high', 'public');//720px
+            $pathHigh      =  $request->file('high')->store('videos/high', 'public');//720px
 
-        $path_thumbnail =  $request->file('thumbnail')->store('images/thumbnail', 'public');
+        $pathThumbnail =  $request->file('thumbnail')->store('images/thumbnail', 'public');
         
         $video = new Video();
         $video->title       = $request->input('title');
         $video->status      = 1;
         $video->views       = 0;
-        $video->low         = $path_low; 
-        $video->medium      = $path_medium; 
-        $video->high        = $path_high;        
-        $video->thumbnail   = $path_thumbnail;
-        
+        $video->low         = $pathLow; 
+        $video->medium      = $pathMedium; 
+        $video->high        = $pathHigh;        
+        $video->thumbnail   = $pathThumbnail;
+
         if($video->save())
+        {
+            $video->tags()->attach($request->input('tags'));
             return redirect('/video/create');
+        }
         else
             return view('video.create');
     }
@@ -118,8 +124,15 @@ class VideoController extends Controller
      * @param  \App\Video  $video
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Video $video)
+    public function destroy(int $id)
     {
-        //
+        $video = Video::find($id);
+
+        if(!empty($video))
+        {
+            Video::where('id', $id)->delete();
+        }
+
+        return redirect(route('video.index'));
     }
 }

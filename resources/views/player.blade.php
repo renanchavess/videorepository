@@ -9,7 +9,6 @@
                     @if(!empty($video->low))
                         <source src="{{'/storage/'.$video->low}}" type="video/mp4">
                     @endif
-
                     @if(!empty($video->medium))
                         <source src="{{'/storage/'.$video->medium}}" type="video/mp4">
                     @endif

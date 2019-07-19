@@ -16,7 +16,19 @@
                 <input type="text" name="title" id="title" value="{{ old('title') }}"
                 class="form-control {{ $errors->has('title') ? 'is-invalid' : ''}}">
             </div>
+            <div class="form-group col-12">
+                <label for="tags">Tags 
+                    @if($errors->has('tags')) 
+                        <label class="alert-danger">{{$errors->first('tags')}}</label> 
+                    @endif
+                </label>
+                <select name="tags[]" multiple class="form-control">
+                    @foreach($tags as $tag)
+                        <option value="{{ $tag->id }}"> {{ $tag->name }} </option>
+                    @endforeach
+                </select>
 
+            </div>
             <div class="form-group col-12">
                 <label for="low">Video Low 360p
                     @if($errors->has('low')) 
